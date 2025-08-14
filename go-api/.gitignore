@@ -1,0 +1,36 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+main
+main.exe
+
+# Air tmp build folder
+tmp/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go build cache
+*.test
+*.out
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+
+# Vendor (if not committing deps)
+vendor/
+
+# Logs
+*.log
+
+
+# Envs
+.env
+.env.*
+!.env.example
