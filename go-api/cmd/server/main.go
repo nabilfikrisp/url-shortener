@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/nabilfikrisp/url-shortener/internal/config"
 	"github.com/nabilfikrisp/url-shortener/internal/database"
+	"github.com/nabilfikrisp/url-shortener/internal/features/url"
 )
 
 func main() {
@@ -16,7 +17,15 @@ func main() {
 		log.Fatalf("Error connecting to database: %v", db.Name())
 	}
 
+	// Auto-migrate model
+	if err := db.AutoMigrate(&url.URLModel{}); err != nil {
+		log.Fatal(err)
+	}
+
 	app := fiber.New()
+
+	urlHandler := url.InitURLHandler(db)
+	url.RegisterRoutes(app, urlHandler)
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
@@ -24,5 +33,5 @@ func main() {
 		})
 	})
 
-	app.Listen(":" + cfg.Port)
+	log.Fatal(app.Listen(":" + cfg.Port))
 }
