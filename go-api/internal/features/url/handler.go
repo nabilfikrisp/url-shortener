@@ -24,7 +24,7 @@ type ShortenPostRequest struct {
 	Original string `json:"original" validate:"required,url"`
 }
 
-func (h *URLHandler) validateShortenRequest(c *fiber.Ctx, req *ShortenPostRequest) error {
+func validateShortenRequest(c *fiber.Ctx, req *ShortenPostRequest) error {
 	if err := c.BodyParser(req); err != nil {
 		return errors.New("invalid request body: " + err.Error())
 	}
@@ -50,7 +50,7 @@ func (h *URLHandler) validateShortenRequest(c *fiber.Ctx, req *ShortenPostReques
 
 func (h *URLHandler) Create(c *fiber.Ctx) error {
 	req := new(ShortenPostRequest)
-	if err := h.validateShortenRequest(c, req); err != nil {
+	if err := validateShortenRequest(c, req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			response.ErrorPayload(response.ErrorResponseParams{
 				Message: "Invalid request",
