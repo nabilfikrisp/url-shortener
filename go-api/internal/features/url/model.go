@@ -11,7 +11,7 @@ type URLModel struct {
 	ID         uint           `gorm:"primaryKey" json:"id"`
 	ShortToken string         `gorm:"uniqueIndex;size:20;not null" json:"short_token"`
 	Original   string         `gorm:"not null" json:"original"`
-	Clicks     int            `gorm:"default:0" json:"clicks"`
+	ClickCount int            `gorm:"default:0" json:"click_count"`
 	CreatedAt  time.Time      `json:"created_at"`
 	UpdatedAt  time.Time      `json:"updated_at"`
 	DeletedAt  gorm.DeletedAt `gorm:"index" json:"-"`

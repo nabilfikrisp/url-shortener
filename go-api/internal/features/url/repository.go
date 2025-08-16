@@ -9,6 +9,7 @@ import (
 type URLRepo interface {
 	Create(url *URLModel) error
 	FindByShortToken(shortToken string) (*URLModel, error)
+	IncrementClickCount(shortToken string) (int64, error)
 }
 
 type urlRepo struct {
@@ -27,7 +28,7 @@ func (r *urlRepo) Create(url *URLModel) error {
 
 func (r *urlRepo) FindByShortToken(shortToken string) (*URLModel, error) {
 	if shortToken == "" {
-		return nil, errors.New("short token cannot be empty")
+		return nil, errors.New("short token is required")
 	}
 
 	var url URLModel
@@ -38,4 +39,17 @@ func (r *urlRepo) FindByShortToken(shortToken string) (*URLModel, error) {
 		return nil, err
 	}
 	return &url, nil
+}
+
+func (r *urlRepo) IncrementClickCount(shortToken string) (int64, error) {
+	if shortToken == "" {
+		return 0, errors.New("short token is required")
+	}
+
+	result := r.db.Model(&URLModel{}).Where("short_token = ?", shortToken).UpdateColumn("click_count", gorm.Expr("click_count + 1"))
+	if result.RowsAffected == 0 {
+		return 0, gorm.ErrRecordNotFound
+	}
+
+	return result.RowsAffected, result.Error
 }
