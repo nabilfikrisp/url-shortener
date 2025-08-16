@@ -1,6 +1,8 @@
 package url
 
 import (
+	"errors"
+
 	"github.com/asaskevich/govalidator"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,34 +20,41 @@ func NewURLHandler(service *URLService) *URLHandler {
 	}
 }
 
-func (h *URLHandler) Create(c *fiber.Ctx) error {
-	var req struct {
-		Original string `json:"original" validate:"required,url"`
+type ShortenPostRequest struct {
+	Original string `json:"original" validate:"required,url"`
+}
+
+func (h *URLHandler) validateShortenRequest(c *fiber.Ctx, req *ShortenPostRequest) error {
+	if err := c.BodyParser(req); err != nil {
+		return errors.New("invalid request body: " + err.Error())
 	}
 
-	if err := c.BodyParser(&req); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(
-			response.ErrorPayload(response.ErrorResponseParams{
-				Message: "Invalid request body",
-				Err:     err.Error(),
-			}),
-		)
+	if req.Original == "" {
+		return errors.New("original URL is required")
 	}
 
 	if !govalidator.IsURL(req.Original) {
-		return c.Status(fiber.StatusBadRequest).JSON(
-			response.ErrorPayload(response.ErrorResponseParams{
-				Message: "Invalid URL",
-				Err:     "The provided URL is not valid",
-			}),
-		)
+		return errors.New("the provided URL is not valid")
 	}
 
-	if helpers.IsOurDomain(c, req.Original) {
+	isOurDomain, err := helpers.OurDomainValidator(c, req.Original)
+	if err != nil {
+		return errors.New("failed to validate URL: " + err.Error())
+	}
+	if isOurDomain {
+		return errors.New("cannot shorten URLs from our own domain")
+	}
+
+	return nil
+}
+
+func (h *URLHandler) Create(c *fiber.Ctx) error {
+	req := new(ShortenPostRequest)
+	if err := h.validateShortenRequest(c, req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			response.ErrorPayload(response.ErrorResponseParams{
-				Message: "Invalid URL",
-				Err:     "The provided URL is from our own domain",
+				Message: "Invalid request",
+				Err:     err.Error(),
 			}),
 		)
 	}

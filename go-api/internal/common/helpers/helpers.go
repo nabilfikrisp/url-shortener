@@ -1,25 +1,33 @@
 package helpers
 
 import (
-	"fmt"
+	"errors"
 	"net/url"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-// CHECKPOINT BENERIN LOCALHOST MASIH LOLOS
-func IsOurDomain(c *fiber.Ctx, inputURL string) bool {
-	parsed, err := url.Parse(inputURL)
-	if err != nil {
-		return false
+func OurDomainValidator(c *fiber.Ctx, inputURL string) (bool, error) {
+	if inputURL == "" {
+		return false, errors.New("URL cannot be empty")
 	}
 
-	appHost := strings.Split(c.Hostname(), ":")[0]
-	urlHost := strings.Split(parsed.Host, ":")[0]
+	parsed, err := url.Parse(inputURL)
+	if err != nil {
+		return false, errors.New("failed to parse URL")
+	}
 
-	fmt.Print(appHost + "APP HOST")
-	fmt.Print(urlHost + "URL HOST")
+	if parsed.Hostname() == "" {
+		return false, errors.New("URL must have a hostname")
+	}
 
-	return strings.EqualFold(urlHost, appHost)
+	appHost := strings.ToLower(strings.Split(c.Hostname(), ":")[0])
+	urlHost := strings.ToLower(parsed.Hostname())
+
+	if urlHost == "localhost" {
+		return true, nil
+	}
+
+	return appHost == urlHost, nil
 }
