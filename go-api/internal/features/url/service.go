@@ -3,7 +3,6 @@ package url
 import (
 	"crypto/sha1"
 	"encoding/hex"
-	"errors"
 )
 
 type URLService interface {
@@ -27,7 +26,7 @@ func (s *urlService) CreateShortToken(original string) (*URLModel, error) {
 		return nil, err
 	}
 	if existingURL != nil {
-		return nil, errors.New("short token collision: original have been shortened previously")
+		return existingURL, nil
 	}
 
 	url := &URLModel{
