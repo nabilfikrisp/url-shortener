@@ -3,23 +3,36 @@ package url
 import (
 	"crypto/sha1"
 	"encoding/hex"
+	"errors"
 )
 
-type URLService struct {
+type URLService interface {
+	CreateShortToken(original string) (*URLModel, error)
+}
+type urlService struct {
 	repo URLRepo
 }
 
-func NewURLService(repo URLRepo) *URLService {
-	return &URLService{
+func NewURLService(repo URLRepo) URLService {
+	return &urlService{
 		repo: repo,
 	}
 }
 
-func (s *URLService) CreateShortToken(original string) (*URLModel, error) {
-	ShortToken := generateShortToken(original)
+func (s *urlService) CreateShortToken(original string) (*URLModel, error) {
+	shortToken := generateShortToken(original)
+
+	existingURL, err := s.repo.FindByShortToken(shortToken)
+	if err != nil {
+		return nil, err
+	}
+	if existingURL != nil {
+		return nil, errors.New("short token collision: original have been shortened previously")
+	}
+
 	url := &URLModel{
 		Original:   original,
-		ShortToken: ShortToken,
+		ShortToken: shortToken,
 	}
 	if err := s.repo.Create(url); err != nil {
 		return nil, err

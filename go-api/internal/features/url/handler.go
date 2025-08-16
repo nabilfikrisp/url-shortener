@@ -10,34 +10,40 @@ import (
 	"github.com/nabilfikrisp/url-shortener/internal/common/response"
 )
 
-type URLHandler struct {
-	service *URLService
+type URLHandler interface {
+	Create(c *fiber.Ctx) error
+}
+type urlHandler struct {
+	service URLService
 }
 
-func NewURLHandler(service *URLService) *URLHandler {
-	return &URLHandler{
+func NewURLHandler(service URLService) URLHandler {
+	return &urlHandler{
 		service: service,
 	}
 }
 
-type ShortenPostRequest struct {
-	Original string `json:"original" validate:"required,url"`
+type shortenPostRequest struct {
+	Url string `json:"url" validate:"required,url"`
 }
 
-func validateShortenRequest(c *fiber.Ctx, req *ShortenPostRequest) error {
+func validateShortenRequest(c *fiber.Ctx, req *shortenPostRequest) error {
 	if err := c.BodyParser(req); err != nil {
 		return errors.New("invalid request body: " + err.Error())
 	}
 
-	if req.Original == "" {
-		return errors.New("original URL is required")
+	if req.Url == "" {
+		return errors.New("URL is required")
 	}
 
-	if !govalidator.IsURL(req.Original) {
+	return nil
+}
+func validateShortenRule(c *fiber.Ctx, req *shortenPostRequest) error {
+	if !govalidator.IsURL(req.Url) {
 		return errors.New("the provided URL is not valid")
 	}
 
-	isOurDomain, err := helpers.OurDomainValidator(c, req.Original)
+	isOurDomain, err := helpers.OurDomainValidator(c, req.Url)
 	if err != nil {
 		return errors.New("failed to validate URL: " + err.Error())
 	}
@@ -48,8 +54,8 @@ func validateShortenRequest(c *fiber.Ctx, req *ShortenPostRequest) error {
 	return nil
 }
 
-func (h *URLHandler) Create(c *fiber.Ctx) error {
-	req := new(ShortenPostRequest)
+func (h *urlHandler) Create(c *fiber.Ctx) error {
+	req := new(shortenPostRequest)
 	if err := validateShortenRequest(c, req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(
 			response.ErrorPayload(response.ErrorResponseParams{
@@ -59,7 +65,16 @@ func (h *URLHandler) Create(c *fiber.Ctx) error {
 		)
 	}
 
-	url, err := h.service.CreateShortToken(req.Original)
+	if err := validateShortenRule(c, req); err != nil {
+		return c.Status(fiber.StatusUnprocessableEntity).JSON(
+			response.ErrorPayload(response.ErrorResponseParams{
+				Message: "Invalid request",
+				Err:     err.Error(),
+			}),
+		)
+	}
+
+	url, err := h.service.CreateShortToken(req.Url)
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(
 			response.ErrorPayload(response.ErrorResponseParams{
