@@ -10,7 +10,7 @@ test-unit:
 
 # Run integration tests
 test-integration:
-	go test -tags=integration ./tests/integration/... -v
+	go test ./tests/integration/... -v
 
 # Bring up docker compose test db
 test-db-up:

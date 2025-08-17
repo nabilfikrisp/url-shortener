@@ -5,43 +5,13 @@ import (
 
 	"github.com/nabilfikrisp/url-shortener/internal/features/url"
 	"github.com/stretchr/testify/assert"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
-
-func setupTestDB(t *testing.T) *gorm.DB {
-	dsn := "postgres://testuser:testpass@localhost:5433/testdb?sslmode=disable"
-
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent),
-	})
-	if err != nil {
-		t.Fatalf("failed to connect to database: %v", err)
-	}
-
-	// reset schema before each test
-	err = db.Migrator().DropTable(&url.URLModel{})
-	if err != nil {
-		t.Fatalf("failed to drop table: %v", err)
-	}
-	err = db.AutoMigrate(&url.URLModel{})
-	if err != nil {
-		t.Fatalf("failed to migrate: %v", err)
-	}
-
-	// cleanup after test
-	t.Cleanup(func() {
-		db.Migrator().DropTable(&url.URLModel{})
-	})
-
-	return db
-}
 
 func TestURLRepo(t *testing.T) {
 	t.Run("Create", func(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
-			db := setupTestDB(t)
+			db := SetupTestDB(t)
 			repo := url.NewURLRepo(db)
 
 			newURL := &url.URLModel{
@@ -59,7 +29,7 @@ func TestURLRepo(t *testing.T) {
 		})
 
 		t.Run("Duplicate Short Token", func(t *testing.T) {
-			db := setupTestDB(t)
+			db := SetupTestDB(t)
 			repo := url.NewURLRepo(db)
 
 			firstURL := &url.URLModel{
@@ -81,7 +51,7 @@ func TestURLRepo(t *testing.T) {
 
 	t.Run("FindByShortToken", func(t *testing.T) {
 		t.Run("Found", func(t *testing.T) {
-			db := setupTestDB(t)
+			db := SetupTestDB(t)
 			repo := url.NewURLRepo(db)
 
 			// Create a URL first
@@ -103,7 +73,7 @@ func TestURLRepo(t *testing.T) {
 		})
 
 		t.Run("Not Found", func(t *testing.T) {
-			db := setupTestDB(t)
+			db := SetupTestDB(t)
 			repo := url.NewURLRepo(db)
 
 			found, err := repo.FindByShortToken("nonexistent")
@@ -112,7 +82,7 @@ func TestURLRepo(t *testing.T) {
 		})
 
 		t.Run("Empty Token", func(t *testing.T) {
-			db := setupTestDB(t)
+			db := SetupTestDB(t)
 			repo := url.NewURLRepo(db)
 
 			found, err := repo.FindByShortToken("")
@@ -124,7 +94,7 @@ func TestURLRepo(t *testing.T) {
 
 	t.Run("IncrementClickCount", func(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
-			db := setupTestDB(t)
+			db := SetupTestDB(t)
 			repo := url.NewURLRepo(db)
 
 			// Create a URL first
@@ -148,7 +118,7 @@ func TestURLRepo(t *testing.T) {
 		})
 
 		t.Run("Record Not Found", func(t *testing.T) {
-			db := setupTestDB(t)
+			db := SetupTestDB(t)
 			repo := url.NewURLRepo(db)
 
 			rowsAffected, err := repo.IncrementClickCount("nonexistent")
@@ -158,7 +128,7 @@ func TestURLRepo(t *testing.T) {
 		})
 
 		t.Run("Empty Token", func(t *testing.T) {
-			db := setupTestDB(t)
+			db := SetupTestDB(t)
 			repo := url.NewURLRepo(db)
 
 			rowsAffected, err := repo.IncrementClickCount("")
@@ -168,7 +138,7 @@ func TestURLRepo(t *testing.T) {
 		})
 
 		t.Run("Multiple Increments", func(t *testing.T) {
-			db := setupTestDB(t)
+			db := SetupTestDB(t)
 			repo := url.NewURLRepo(db)
 
 			// Create a URL first
