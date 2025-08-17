@@ -94,13 +94,6 @@ func (h *urlHandler) Create(c *fiber.Ctx) error {
 
 func (h *urlHandler) FindByShortToken(c *fiber.Ctx) error {
 	shortToken := c.Params("shortToken")
-	if shortToken == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(
-			response.ErrorPayload(response.ErrorResponseParams{
-				Message: "Short token parameter is required",
-			}),
-		)
-	}
 
 	url, err := h.service.FindByShortToken(shortToken)
 	if err != nil {
@@ -120,13 +113,6 @@ func (h *urlHandler) FindByShortToken(c *fiber.Ctx) error {
 
 func (h *urlHandler) RedirectToOriginal(c *fiber.Ctx) error {
 	shortToken := c.Params("shortToken")
-	if shortToken == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(
-			response.ErrorPayload(response.ErrorResponseParams{
-				Message: "Short token parameter is required",
-			}),
-		)
-	}
 
 	url, err := h.service.RedirectService(shortToken)
 	if err != nil {
@@ -134,13 +120,6 @@ func (h *urlHandler) RedirectToOriginal(c *fiber.Ctx) error {
 			response.ErrorPayload(response.ErrorResponseParams{
 				Message: "Short URL not found",
 				Err:     err.Error(),
-			}),
-		)
-	}
-	if url == nil {
-		return c.Status(fiber.StatusNotFound).JSON(
-			response.ErrorPayload(response.ErrorResponseParams{
-				Message: "The requested short URL does not exist",
 			}),
 		)
 	}

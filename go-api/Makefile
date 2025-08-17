@@ -21,5 +21,5 @@ test-db-down:
 	docker compose -f docker-compose.test.yml down -v
 
 coverage:
-	go test ./... -coverpkg=./... -coverprofile=coverage.out
-	go tool cover -html=coverage.out
+	go test ./... -coverpkg=./... -coverprofile="coverage.out"
+	go tool cover -html="coverage.out"
