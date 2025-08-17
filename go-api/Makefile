@@ -2,7 +2,7 @@
 
 # Run all tests
 test:
-	go test ./... -cover
+	go test ./... -v
 
 # Run only unit tests
 test-unit:
@@ -19,6 +19,16 @@ test-db-up:
 # Tear down docker compose test db
 test-db-down:
 	docker compose -f docker-compose.test.yml down -v
+
+	
+# Bring up docker compose dev db
+dev-db-up:
+	docker compose -f docker-compose.dev.yml up -d dev-db
+
+# Tear down docker compose dev db
+dev-db-down:
+	docker compose -f docker-compose.dev.yml down -v
+
 
 coverage:
 	go test ./... -coverpkg=./... -coverprofile="coverage.out"

@@ -1,9 +1,9 @@
 services:
-  test-db:
+  dev-db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: testuser
-      POSTGRES_PASSWORD: testpass
-      POSTGRES_DB: testdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: url_shortener
     ports:
       - "5433:5432" # 5432 used in my case hehe

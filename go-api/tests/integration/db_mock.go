@@ -1,8 +1,10 @@
 package integration
 
 import (
+	"os"
 	"testing"
 
+	"github.com/joho/godotenv"
 	"github.com/nabilfikrisp/url-shortener/internal/features/url"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -10,7 +12,12 @@ import (
 )
 
 func SetupTestDB(t *testing.T) *gorm.DB {
-	dsn := "postgres://testuser:testpass@localhost:5433/testdb?sslmode=disable"
+	_ = godotenv.Load("../../.env.test")
+
+	dsn := os.Getenv("TEST_DATABASE_URL")
+	if dsn == "" {
+		t.Fatal("TEST_DATABASE_URL is not set in .env.test")
+	}
 
 	db, _ := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
