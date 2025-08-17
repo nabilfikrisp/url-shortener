@@ -1,9 +1,9 @@
 package url
 
 import (
-	"crypto/sha1"
-	"encoding/hex"
 	"errors"
+
+	"github.com/nabilfikrisp/url-shortener/internal/common/helpers"
 )
 
 type URLService interface {
@@ -22,7 +22,7 @@ func NewURLService(repo URLRepo) URLService {
 }
 
 func (s *urlService) CreateShortToken(original string) (*URLModel, error) {
-	shortToken := generateShortToken(original)
+	shortToken := helpers.GenerateShortToken(original)
 
 	existingURL, err := s.repo.FindByShortToken(shortToken)
 	if err != nil {
@@ -71,9 +71,4 @@ func (s *urlService) RedirectService(shortToken string) (*URLModel, error) {
 	}
 
 	return url, nil
-}
-
-func generateShortToken(s string) string {
-	hash := sha1.Sum([]byte(s))
-	return hex.EncodeToString(hash[:])[:16]
 }
