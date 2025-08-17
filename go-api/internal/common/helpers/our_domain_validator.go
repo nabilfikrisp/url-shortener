@@ -4,11 +4,9 @@ import (
 	"errors"
 	"net/url"
 	"strings"
-
-	"github.com/gofiber/fiber/v2"
 )
 
-func OurDomainValidator(c *fiber.Ctx, inputURL string) (bool, error) {
+func OurDomainValidator(ourDomain string, inputURL string) (bool, error) {
 	if inputURL == "" {
 		return false, errors.New("URL cannot be empty")
 	}
@@ -22,7 +20,7 @@ func OurDomainValidator(c *fiber.Ctx, inputURL string) (bool, error) {
 		return false, errors.New("URL must have a hostname")
 	}
 
-	appHost := strings.ToLower(strings.Split(c.Hostname(), ":")[0])
+	appHost := strings.ToLower(strings.Split(ourDomain, ":")[0])
 	urlHost := strings.ToLower(parsed.Hostname())
 
 	if urlHost == "localhost" {

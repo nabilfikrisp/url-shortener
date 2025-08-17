@@ -8,7 +8,7 @@ import (
 )
 
 func TestGenerateShortToken(t *testing.T) {
-	t.Run("deterministic - same input gives same output", func(t *testing.T) {
+	t.Run("same input gives same output", func(t *testing.T) {
 		input := "https://test.com"
 
 		result1 := helpers.GenerateShortToken(input)

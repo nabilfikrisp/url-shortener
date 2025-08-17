@@ -45,7 +45,7 @@ func validateShortenRule(c *fiber.Ctx, req *shortenPostRequest) error {
 		return errors.New("please provide a valid URL")
 	}
 
-	isOurDomain, err := helpers.OurDomainValidator(c, req.Url)
+	isOurDomain, err := helpers.OurDomainValidator(c.Hostname(), req.Url)
 	if err != nil {
 		return errors.New("unable to validate URL domain: " + err.Error())
 	}
