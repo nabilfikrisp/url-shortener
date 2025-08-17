@@ -15,5 +15,5 @@ func InitURLHandler(db *gorm.DB) URLHandler {
 func RegisterRoutes(app *fiber.App, handler URLHandler) {
 	app.Post("/shorten", handler.Create)
 	app.Get("/:shortToken", handler.RedirectToOriginal)
-	app.Get("/api/urls/:shortToken", handler.FindByShortToken)
+	app.Get("/stats/:shortToken", handler.FindByShortToken)
 }

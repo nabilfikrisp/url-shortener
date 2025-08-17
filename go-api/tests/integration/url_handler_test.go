@@ -154,7 +154,7 @@ func TestURLHandler(t *testing.T) {
 
 	})
 
-	t.Run("GET /api/urls/:shortToken", func(t *testing.T) {
+	t.Run("GET /stats/:shortToken", func(t *testing.T) {
 
 		t.Run("Success", func(t *testing.T) {
 			app := setupTestApp(t)
@@ -170,7 +170,6 @@ func TestURLHandler(t *testing.T) {
 			defer resp.Body.Close()
 
 			respBody, _ := io.ReadAll(resp.Body)
-			t.Logf("Raw response: %s", string(respBody))
 
 			// Decode into response.Success first
 			var successResp response.Success
@@ -189,7 +188,7 @@ func TestURLHandler(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			req = httptest.NewRequest("GET", "/api/urls/"+created.ShortToken, nil)
+			req = httptest.NewRequest("GET", "/stats/"+created.ShortToken, nil)
 			resp, err = app.Test(req, -1)
 			if err != nil {
 				t.Fatal(err)
@@ -202,7 +201,7 @@ func TestURLHandler(t *testing.T) {
 		t.Run("Short Token Not Found", func(t *testing.T) {
 			app := setupTestApp(t)
 
-			req := httptest.NewRequest("GET", "/api/urls/nonexistent", nil)
+			req := httptest.NewRequest("GET", "/stats/nonexistent", nil)
 			resp, err := app.Test(req, -1)
 			if err != nil {
 				t.Fatal(err)
@@ -218,9 +217,9 @@ func TestURLHandler(t *testing.T) {
 			mockService := new(MockURLService)
 			mockService.On("FindByShortToken", "error-token").Return(nil, errors.New("database connection failed"))
 			h := url.NewURLHandler(mockService)
-			app.Get("/api/urls/:shortToken", h.FindByShortToken)
+			app.Get("/stats/:shortToken", h.FindByShortToken)
 
-			req := httptest.NewRequest("GET", "/api/urls/error-token", nil)
+			req := httptest.NewRequest("GET", "/stats/error-token", nil)
 			resp, err := app.Test(req, -1)
 			if err != nil {
 				t.Fatal(err)
@@ -280,7 +279,6 @@ func TestURLHandler(t *testing.T) {
 			assert.Equal(t, fiber.StatusNotFound, resp.StatusCode)
 
 			respBody, _ := io.ReadAll(resp.Body)
-			t.Logf("Error response: %s", string(respBody))
 
 			var errResp response.Error
 			if err := json.Unmarshal(respBody, &errResp); err != nil {
