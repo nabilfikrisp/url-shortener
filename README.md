@@ -111,7 +111,7 @@ go run cmd/server/main.go
 ```
 
 The server will start on (port based on env):
-👉 [http://localhost:3001](http://localhost:3001)
+[http://localhost:3001](http://localhost:3001)
 
 ---
 
@@ -211,7 +211,7 @@ This project separates **unit tests** and **integration tests**, although both c
 
 ---
 
-### 🗄️ Setup Test Database
+### Setup Test Database
 
 - If you already have a database set up manually, just update the values in **`.env.test`**.
 - If not, you can spin up a Postgres instance using Docker.
@@ -236,7 +236,7 @@ make test-db-down
 
 ---
 
-### ⚙️ Setup Environment
+### Setup Environment
 
 Create your **`.env.test`** file by either:
 
