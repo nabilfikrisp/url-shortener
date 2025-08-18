@@ -12,6 +12,10 @@ test-unit:
 test-integration:
 	go test ./tests/integration/... -v
 
+# Run main test case tests
+test-main-test-case:
+	go test ./tests/integration -v -run TestMainTestCase
+
 # Bring up docker compose test db
 test-db-up:
 	docker compose -f docker-compose.test.yml up -d test-db

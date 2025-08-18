@@ -17,38 +17,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func setupTestApp(t *testing.T) *fiber.App {
-	db := SetupTestDB(t)
-
-	// init handler + register routes
-	handler := url.InitURLHandler(db)
-	app := fiber.New()
-	url.RegisterRoutes(app, handler)
-
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.JSON(fiber.Map{
-			"message": "Hello, World!",
-		})
-	})
-
-	return app
-}
-
 func TestURLHandler(t *testing.T) {
-
-	t.Run("GET /", func(t *testing.T) {
-		app := setupTestApp(t)
-		req := httptest.NewRequest("GET", "/", nil)
-		resp, err := app.Test(req, 1)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		defer resp.Body.Close()
-
-		assert.Equal(t, fiber.StatusOK, resp.StatusCode)
-	})
-
 	t.Run("POST /shorten", func(t *testing.T) {
 		t.Run("Success", func(t *testing.T) {
 			app := setupTestApp(t)
