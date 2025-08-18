@@ -248,6 +248,14 @@ or manually writing one yourself.
 
 ---
 
+### Main Test Cases
+
+```bash
+go test ./tests/integration -v -run TestMainTestCase
+# or
+make test-main-test-case
+```
+
 ### Run All Tests
 
 ```bash
