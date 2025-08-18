@@ -12,7 +12,19 @@ Includes unit tests, integration tests with Docker, and code coverage reporting.
 - PostgreSQL database with GORM
 - Unit & integration test coverage
 - Docker Compose setup for testing DB
-- REST API with 3 endpoints:
+- REST API with 3 endpoints
+
+## Programming Language Choice
+
+I chose **Go** for this project because I will be working with Go in my upcoming role and wanted to take this opportunity to learn the language and its ecosystem.
+
+## Design Decisions & Assumptions
+
+- **Repository Pattern**: I implemented the repository pattern which commonly used in Go applications to separate data access logic from business logic. As I'm still learning Go idioms, some patterns may reflect influences from my previous TypeScript experience.
+- **Database Choice**: Selected PostgreSQL with GORM as I have the most experience with PostgreSQL from previous projects.
+- **My Thoughts About This Project**: While this serves as both a technical assessment and a learning exercise, I've aimed for best practices and functional requirements. Both the application and test cases could have been implemented much faster if i use TypeScript with Express/Hono/NestJS, but the majority of development time was invested in learning Go syntax, patterns, and best practices.
+
+---
 
 # URL Shortener – Go API
 
